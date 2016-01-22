@@ -1,0 +1,13 @@
+CONTAINERS=`docker ps -a| awk '$2 == "ifx" { print $1 }'`
+echo "$CONTAINERS"
+if [ -n "$CONTAINERS" ]; then
+  echo Removing old ifx containers...
+  docker rm $CONTAINERS
+  if [[ $? != 0 ]]; then
+     exit 1
+  fi
+fi
+echo Removing Image "ifx"...
+docker rmi ifx
+echo Starting build ...
+docker build  -t ifx .
