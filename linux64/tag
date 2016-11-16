@@ -1,0 +1,5 @@
+id=`docker images |grep informix-developer-edition|awk '{print $3}'`
+echo "IFX Docker ID:"=$id
+
+docker tag $id ibmcom/informix-developer-edition:latest
+

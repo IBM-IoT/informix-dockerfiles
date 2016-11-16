@@ -8,10 +8,10 @@ MAINTAINER InformixTeam
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 # copy to root dir
-COPY    iif.12.10.FC6IE.linux-x86_64.tar informix_install.sh JSON.jar /  
+COPY    iif.12.10.tar informix_install.sh  /  
 
-RUN     bash ./informix_install.sh iif.12.10.FC6IE.linux-x86_64.tar \
-        && rm iif.12.10.FC6IE.linux-x86_64.tar
+RUN     bash ./informix_install.sh iif.12.10.tar \
+        && rm iif.12.10.tar
 
 RUN 	echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 

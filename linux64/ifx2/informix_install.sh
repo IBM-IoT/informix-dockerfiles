@@ -5,7 +5,7 @@
 #  url:         https://github.com/0x1fff/docker-informix
 #
 #  usage:       Please run as root!
-#               ./informix_install.sh iif.12.10.FC3IE.linux-x86_64.tar
+#               ./informix_install.sh iif.12.10......
 #
 #  Detailed Description:
 #   - Upgrades Debian based system and fetches Informix dependencies
@@ -202,15 +202,14 @@ ONCONFIG_PATH="${INSTALL_DIR}"/etc/onconfig."${INSTANCE_NAME}"
 SQLHOSTS_PATH="${INSTALL_DIR}"/etc/sqlhosts."${INSTANCE_NAME}"
 cp "${INSTALL_DIR}"/etc/onconfig.std "${ONCONFIG_PATH}"
 cp "${INSTALL_DIR}"/etc/sqlhosts.std "${SQLHOSTS_PATH}"
-echo ">>>    Copying JSON.jar"
-cp /JSON.jar "${INSTALL_DIR}"/bin 
 
 echo ">>>    Postconfig onconfig ..."
-sed -i 's#^ROOTNAME rootdbs#ROOTNAME dbs_root#g'                            "${ONCONFIG_PATH}"
-sed -i "s#^ROOTPATH .*#ROOTPATH ${DATA_DIR}/spaces/dbs_root/dbs_root.000#g" "${ONCONFIG_PATH}"
+#sed -i 's#^ROOTNAME rootdbs#ROOTNAME dbs_root#g'                            "${ONCONFIG_PATH}"
+sed -i "s#^ROOTPATH .*#ROOTPATH ${DATA_DIR}/spaces/rootdbs.000#g" "${ONCONFIG_PATH}"
 sed -i "s#^CONSOLE .*#CONSOLE ${DATA_DIR}/logs/console.log#g"               "${ONCONFIG_PATH}"
 sed -i "s#^MSGPATH .*#MSGPATH ${DATA_DIR}/logs/online.log#g"                "${ONCONFIG_PATH}"
 sed -i "s#^DBSERVERNAME.*#DBSERVERNAME ${INSTANCE_NAME}#g"                  "${ONCONFIG_PATH}"
+sed -i "s#^DBSERVERALIASES.*#DBSERVERALIASES ${INSTANCE_NAME}_dr#g"              "${ONCONFIG_PATH}"
 sed -i "s#^DEF_TABLE_LOCKMODE page#DEF_TABLE_LOCKMODE row#g"                "${ONCONFIG_PATH}"
 sed -i "s#^TAPEDEV .*#TAPEDEV   ${DATA_DIR}/backup/datas#g"                 "${ONCONFIG_PATH}"
 sed -i "s#^LTAPEDEV .*#LTAPEDEV /dev/null#g"                  "${ONCONFIG_PATH}"
@@ -219,12 +218,17 @@ chown "${USER_NAME}:" "${ONCONFIG_PATH}"
 echo ">>>    Postconfig sqlhost ..."
 if [ ! `grep onsoctcp "${SQLHOSTS_PATH}" | wc -l` -ne 0 ] ; then
 	echo "${INSTANCE_NAME}        onsoctcp        `hostname`               sqlexec" >> "${SQLHOSTS_PATH}"
+	echo "${INSTANCE_NAME}_dr        drsoctcp        `hostname`               sqlexec_dr" >> "${SQLHOSTS_PATH}"
 fi
 chown "${USER_NAME}:" "${SQLHOSTS_PATH}"
 
 echo ">>>    Include tcp support ..."
 if [ ! `grep sqlexec /etc/services | wc -l` -ne 0 ] ; then
     echo -e 'sqlexec\t9088/tcp' >>/etc/services
+fi
+echo ">>>    Include drda support ..."
+if [ ! `grep sqlexec_dr /etc/services | wc -l` -ne 0 ] ; then
+    echo -e 'sqlexec_dr\t9089/tcp' >>/etc/services
 fi
 
 echo ">>>    Create Informix user environnement"
@@ -234,7 +238,7 @@ export INFORMIXDIR="${INSTALL_DIR}"
 export INFORMIXTERM=terminfo
 export ONCONFIG=onconfig.${INSTANCE_NAME}
 export INFORMIXSQLHOSTS="\${INFORMIXDIR}/etc/sqlhosts.${INSTANCE_NAME}"
-export CLIENT_LOCALE=en_US.utf8
+#export CLIENT_LOCALE=en_US.utf8
 #export DB_LOCALE=en_US.utf8
 export DBDATE=Y4MD-
 export DBDELIMITER='|';

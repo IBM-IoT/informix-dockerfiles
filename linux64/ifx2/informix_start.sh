@@ -19,7 +19,7 @@ INFORMIX_HOME="${INFORMIX_HOME%/}" # Strip the trailing / (if exists)
 export INFORMIX_DATA_DIR="${INFORMIX_HOME}/data/"
 INFORMIX_DATA_DIR="${INFORMIX_DATA_DIR%/}"
 
-export MYINFORMIX_DBSPACE="dbs_root"
+export MYINFORMIX_DBSPACE="rootdbs"
 
 source "${INFORMIX_HOME}/.bashrc"
 source "${INFORMIX_HOME}/ifx_dev.env"
@@ -28,6 +28,7 @@ export HOSTNAME=${HOSTNAME:-`hostname`}
 
 echo ">>>    Update sqlhost ..."
 sudo echo "${INFORMIXSERVER}        onsoctcp        ${HOSTNAME}               sqlexec" > "${INFORMIXSQLHOSTS}"
+sudo echo "${INFORMIXSERVER}_dr        drsoctcp        ${HOSTNAME}               sqlexec_dr" >> "${INFORMIXSQLHOSTS}"
 sudo chown informix: $INFORMIXSQLHOSTS
 sudo chmod 744 $INFORMIXSQLHOSTS
 
@@ -36,11 +37,11 @@ if [ ! -e "${INFORMIX_DATA_DIR}/.initialized" ] ; then
 	mkdir -p "${INFORMIX_DATA_DIR}"/logs
 	mkdir -p "${INFORMIX_DATA_DIR}"/backup/datas
 	mkdir -p "${INFORMIX_DATA_DIR}"/backup/logs
-	mkdir -p "${INFORMIX_DATA_DIR}"/spaces/dbs_root/
-	touch "${INFORMIX_DATA_DIR}"/spaces/dbs_root/dbs_root.000
+	mkdir -p "${INFORMIX_DATA_DIR}"/spaces/
+	touch "${INFORMIX_DATA_DIR}"/spaces/rootdbs.000
 
 	chown -R informix: "${INFORMIX_DATA_DIR}"/{logs,backup,spaces}
-	chmod 660 "${INFORMIX_DATA_DIR}"/spaces/dbs_root/dbs_root.000
+	chmod 660 "${INFORMIX_DATA_DIR}"/spaces/rootdbs.000
 	chmod -R 777 "${INFORMIX_DATA_DIR}"/backup
 
 	# Initialize shared memmory and data structure
@@ -130,6 +131,8 @@ fi
 INSTALL_DIR=$INFORMIXDIR
 cd ${INSTALL_DIR}/etc
 
+TCP_PORT=9088
+DRDA_PORT=9089
 MONGO_PORT=27017
 REST_PORT=27018
 MQTT_PORT=27883
@@ -171,7 +174,7 @@ if [[ ! -f custom_mqtt.properties ]]; then
 fi
 	cat custom_mqtt.properties > json_mqtt.properties
 	echo "include=nosql.properties" >> json_mqtt.properties
-	echo "listener.type=mqtt-netty" >> json_mqtt.properties
+	echo "listener.type=mqtt" >> json_mqtt.properties
 	echo "listener.port=$MQTT_PORT" >> json_mqtt.properties
 	echo "listener.hostName=$HOSTNAME" >> json_mqtt.properties
 	echo "url=jdbc:informix-sqli://${HOSTNAME}:9088/${DB_NAME:=sysmaster}:INFORMIXSERVER=${INFORMIXSERVER};USER=${DB_USER:=informix};PASSWORD=${DB_PASS:=in4mix}"  >> json_mqtt.properties
@@ -183,16 +186,7 @@ then
 	myfatal 1 "${MONGO_PORT}, ${REST_PORT}, ${MQTT_PORT} Port is binded to some other service"
 else
 
-#	CLASSPATH="${INSTALL_DIR}/bin/jsonListener.jar:${INSTALL_DIR}/bin/tomcat-embed-core.jar"
-#	java -cp "$CLASSPATH" com.ibm.nosql.server.ListenerCLI \
-#		-config ${INSTALL_DIR}/etc/json_mongo.properties \
-#		-config ${INSTALL_DIR}/etc/json_rest.properties \
-#		-config ${INSTALL_DIR}/etc/json_mqtt.properties \
-#		-logFile ${INSTALL_DIR}/jsonListener_logging.log \
-#		-loglevel info \
-#		-start &
-
-	java -jar "${INFORMIXDIR}"/bin/JSON.jar  \
+	java -jar "${INFORMIXDIR}"/bin/jsonListener.jar  \
 		-config ${INSTALL_DIR}/etc/json_mongo.properties \
 		-config ${INSTALL_DIR}/etc/json_rest.properties \
 		-config ${INSTALL_DIR}/etc/json_mqtt.properties \

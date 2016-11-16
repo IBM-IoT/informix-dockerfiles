@@ -1,0 +1,4 @@
+docker run --privileged -it  -p 9088:9088 -p 27017:27017 -p 27018:27018 -p 27883:27883 -p 9089:9089 --name iif_developer_edition informix-developer-edition 
+
+#docker run --privileged -td  -p 9088:9088 -p 27017:27017 -p 27018:27018 -p 27883:27883 -p 9089:9089 --name iif_developer_edition informix-developer-edition
+

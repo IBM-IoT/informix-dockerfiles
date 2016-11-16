@@ -28,7 +28,7 @@ INSTALL_DIR=$INFORMIXDIR
 #java -cp "$CLASSPATH" com.ibm.nosql.server.ListenerCLI -config ${INSTALL_DIR}/etc/json_mongo.properties -stop
 #java -cp "$CLASSPATH" com.ibm.nosql.server.ListenerCLI -config ${INSTALL_DIR}/etc/json_rest.properties -stop
 
-#java -jar "$INFORMIXDIR"/bin/JSON.jar             \ 
+#java -jar "$INFORMIXDIR"/bin/jsonListener.jar     \ 
 # -config ${INSTALL_DIR}/etc/json_rest.properties  \
 # -config ${INSTALL_DIR}/etc/json_mongo.properties \
 # -config ${INSTALL_DIR}/etc/json_mqtt.properties  \

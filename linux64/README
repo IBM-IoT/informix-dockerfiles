@@ -1,0 +1,26 @@
+ifxbase
+	- builds os env only.  used in conjunction with ifx2
+
+ifx2
+	- builds only informix
+	- relies on ifxbase
+
+
+
+To Build the Docker Image:
+1.  cd ifxbase
+2.  ./build
+3.  cd ifx2
+4.  ./build
+
+
+To Start the Docker Image:
+1.  ./runifx
+	- This has two options, one does -it, the other does -td.
+	- -it will be interactive.  Once you exit the shell it will take the engine down
+	- -td will run the container in the background
+
+2.  To attach to docker container
+	docker exec -it <name> bash
+		name = iif_developer_edition, iif_inovvator_c
+

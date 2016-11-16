@@ -2,7 +2,9 @@
 #  url: 	https://github.com/0x1fff/docker-informix
 #
 
-FROM debian:wheezy
+#FROM debian:wheezy
+#FROM debian:jessie
+FROM debian:latest
 MAINTAINER IfxTeam
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 

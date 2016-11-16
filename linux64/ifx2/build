@@ -1,4 +1,11 @@
-CONTAINERS=`docker ps -a| awk '$2 == "ifx" { print $1 }'`
+CONTAINERS=`docker ps -a| awk '$2 == "informix-developer-edition" { print $1 }'`
+
+if [ -e iif.12.10.tar ]
+then
+rm iif.12.10.tar
+fi
+file=`ls iif*`
+ln -s $file iif.12.10.tar
 echo "$CONTAINERS"
 if [ -n "$CONTAINERS" ]; then
   echo Removing old ifx containers...
@@ -7,7 +14,7 @@ if [ -n "$CONTAINERS" ]; then
      exit 1
   fi
 fi
-echo Removing Image "ifx"...
-docker rmi ifx
+echo Removing Image "informix-developer-edition"...
+docker rmi informix-developer-edition 
 echo Starting build ...
-docker build  -t ifx .
+docker build  -t informix-developer-edition .

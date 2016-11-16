@@ -1,0 +1,2 @@
+docker login
+docker push ibmcom/informix-developer-edition
